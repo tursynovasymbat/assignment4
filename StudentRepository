@@ -1,0 +1,83 @@
+package com.example.school.repository;
+
+import com.example.school.db.DB;
+import com.example.school.entity.Student;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class StudentRepository {
+    
+    public List<Student> getAllStudents() {
+        List<Student> students = new ArrayList<>();
+        try {
+            Connection con = DB.connect();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM students");
+
+            while (rs.next()) {
+                students.add(new Student(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("grade")
+                ));
+            }
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return students;
+    }
+    
+    public Student getStudentById(int id) {
+        try {
+            Connection con = DB.connect();
+            PreparedStatement ps =
+                    con.prepareStatement("SELECT * FROM students WHERE id = ?");
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new Student(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("grade")
+                );
+            }
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public void addStudent(Student student) {
+        try {
+            Connection con = DB.connect();
+            PreparedStatement ps =
+                    con.prepareStatement(
+                            "INSERT INTO students (name, grade) VALUES (?, ?)"
+                    );
+            ps.setString(1, student.getName());
+            ps.setInt(2, student.getGrade());
+            ps.executeUpdate();
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void deleteStudent(int id) {
+        try {
+            Connection con = DB.connect();
+            PreparedStatement ps =
+                    con.prepareStatement("DELETE FROM students WHERE id = ?");
+            ps.setInt(1, id);
+            ps.executeUpdate();
+            con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
