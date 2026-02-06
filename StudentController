@@ -1,0 +1,35 @@
+package com.example.school.controller;
+
+import com.example.school.entity.Student;
+import com.example.school.repository.StudentRepository;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+public class StudentController {
+
+    StudentRepository repo = new StudentRepository();
+
+    @GetMapping("/students")
+    public List<Student> getAll() {
+        return repo.getAllStudents();
+    }
+    
+    @GetMapping("/students/{id}")
+    public Student getById(@PathVariable int id) {
+        return repo.getStudentById(id);
+    }
+    
+    @PostMapping(value = "/students", consumes = "application/json")
+    public String add(@RequestBody Student student) {
+        repo.addStudent(student);
+        return "Student added";
+    }
+    
+    @DeleteMapping("/students/{id}")
+    public String delete(@PathVariable int id) {
+        repo.deleteStudent(id);
+        return "Student deleted";
+    }
+}
